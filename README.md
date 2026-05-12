@@ -32,9 +32,13 @@ A análise utiliza dados da Pesquisa Extensiva do Desenvolvimento Educacional (P
 
 ## Modelo preditivo
 
-- **Algoritmo:** Random Forest (200 estimadores, class_weight=balanced)
-- **Target:** aluno em risco (IAN = 2.5 ou IDA < 5.0)
-- **ROC-AUC:** 99.9% | Recall: 96.9% | Precisão: 100.0%
+- **Algoritmo:** Random Forest Classifier
+- **Target:** aluno em risco educacional, definido por IAN = 2.5 ou IDA < 5.0
+- **ROC-AUC:** 99.9%
+- **Recall:** 96.9%
+- **Precisão:** 100.0%
+
+O modelo foi desenvolvido para estimar a probabilidade de risco educacional a partir dos indicadores do PEDE. Na aplicação Streamlit, a classificação final também respeita regras críticas de negócio: alunos com IAN = 2.5 ou IDA < 5.0 são classificados como em risco, independentemente da probabilidade predita.
 
 ## Tecnologias utilizadas
 
@@ -52,3 +56,9 @@ A análise utiliza dados da Pesquisa Extensiva do Desenvolvimento Educacional (P
 - `modelo.joblib` — Modelo Random Forest serializado
 - `features.joblib` — Lista de features do modelo
 - `requirements.txt` — Dependências do projeto
+
+## Acesse a aplicação
+
+Aplicação publicada no Streamlit Community Cloud:
+
+https://datathon-fiap-pmagicos.streamlit.app/

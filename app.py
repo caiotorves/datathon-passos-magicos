@@ -30,6 +30,7 @@ with col1:
     IPS = st.slider("IPS — Psicossocial", 0.0, 10.0, 6.0, 0.1)
 
 with col2:
+    IPP = st.slider("IPP — Psicopedagógico", 0.0, 10.0, 6.0, 0.1)
     IPV = st.slider("IPV — Ponto de Virada", 0.0, 10.0, 6.0, 0.1)
     ANO = st.selectbox("Ano de referência", options=[2022, 2023, 2024])
     PEDRA = st.selectbox(
@@ -44,7 +45,7 @@ PEDRA_COD = pedra_map[PEDRA]
 
 DELTA_IAA_IDA = IAA - IDA
 IEG_x_IPV = IEG * IPV
-MEDIA_PSICO = np.mean([IPS, 0])
+MEDIA_PSICO = (IPS + IPP) / 2
 
 entrada = pd.DataFrame([{
     "IAN": IAN,
@@ -62,14 +63,26 @@ entrada = pd.DataFrame([{
 
 if st.button("Calcular risco", use_container_width=True):
     prob = modelo.predict_proba(entrada)[0][1]
-    classificacao = modelo.predict(entrada)[0]
+
+    risco_regra = (IAN == 2.5) or (IDA < 5.0)
 
     st.divider()
 
-    if classificacao == 1:
-        st.error(f"⚠️ Aluno em risco educacional — probabilidade: {prob*100:.1f}%")
+    if risco_regra:
+        criterio = []
+        if IAN == 2.5:
+            criterio.append("IAN = 2.5 (defasagem severa)")
+        if IDA < 5.0:
+            criterio.append(f"IDA = {IDA:.1f} (abaixo do limiar crítico)")
+        st.error(
+            f"⚠️ Aluno em risco educacional — probabilidade predita: {prob*100:.1f}%. "
+            f"Critério crítico acionado: {' | '.join(criterio)}."
+        )
     else:
-        st.success(f"✅ Aluno sem risco educacional — probabilidade de risco: {prob*100:.1f}%")
+        if prob >= 0.5:
+            st.error(f"⚠️ Aluno em risco educacional — probabilidade predita: {prob*100:.1f}%.")
+        else:
+            st.success(f"✅ Aluno sem risco educacional — probabilidade de risco: {prob*100:.1f}%.")
 
     st.markdown("**Detalhamento dos indicadores informados:**")
     st.dataframe(entrada.T.rename(columns={0: "Valor"}), use_container_width=True)
